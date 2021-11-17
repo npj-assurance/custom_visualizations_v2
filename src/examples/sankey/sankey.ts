@@ -35,7 +35,8 @@ const vis: Sankey = {
       type: 'string',
       values: [
         { 'Name': 'name' },
-        { 'Name (value)': 'name_value' }
+        { 'Name (value)': 'name_value' },
+        { 'Name (percentage)': 'name_percentage' }
       ]
     },
     show_null_points: {
@@ -256,6 +257,8 @@ const vis: Sankey = {
             return d.name
           case 'name_value':
             return `${d.name} (${d.value})`
+          case 'name_percentage':
+            return `${d.name} (${Math.round(d.value * 10 ** 4) / 10 ** 2}%)`
           default:
             return ''
         }
