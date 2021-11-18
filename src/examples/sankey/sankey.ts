@@ -39,6 +39,12 @@ const vis: Sankey = {
         { 'Name (percentage)': 'name_percentage' }
       ]
     },
+    number_decimals: {
+      type: 'number',
+      label: 'Number of Decimals',
+      display: 'number',
+      default: 0
+    },
     show_null_points: {
       type: 'boolean',
       label: 'Plot Null Values',
@@ -59,6 +65,7 @@ const vis: Sankey = {
   },
   // Render in response to the data or settings changing
   updateAsync (data, element, config, queryResponse, details, doneRendering) {
+    
     if (!handleErrors(this, queryResponse, {
       min_pivots: 0, max_pivots: 0,
       min_dimensions: 2, max_dimensions: undefined,
@@ -244,6 +251,13 @@ const vis: Sankey = {
       .attr('fill', function (d: Cell) { return color(d.name.replace(/ .*/, '')) })
       .attr('stroke', '#555')
 
+    if (config.number_decimals < 0) {
+      config.number_decimals = 0
+    } 
+    else if (config.number_decimals > 100){ 
+      config.number_decimals = 100
+    }
+
     node.append('text')
       .attr('x', function (d: Cell) { return d.x0 - 6 })
       .attr('y', function (d: Cell) { return (d.y1 + d.y0) / 2 })
@@ -256,9 +270,11 @@ const vis: Sankey = {
           case 'name':
             return d.name
           case 'name_value':
-            return `${d.name} (${d.value})`
+            // return `${d.name} (${Math.round(d.value * 10 ** (config.number_decimals)) / 10 ** (config.number_decimals)})`
+            return `${d.name} (${d.value.toFixed(config.number_decimals)})`
           case 'name_percentage':
-            return `${d.name} (${Math.round(d.value * 10 ** 4) / 10 ** 2}%)`
+            return `${d.name} (${(d.value * 100).toFixed(config.number_decimals)}%)`
+            // return `${d.name} (${Math.round(d.value * 10 ** (config.number_decimals + 2)) / 10 ** (config.number_decimals)}%)`
           default:
             return ''
         }
